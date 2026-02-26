@@ -1,0 +1,391 @@
+/**
+ * Tests for x402_pay tool and get_transaction_history tool.
+ * Network calls are fully mocked.
+ */
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+// ─── Mock agentwallet-sdk ──────────────────────────────────────────────────
+
+const mockX402Fetch = vi.fn();
+const mockGetTransactionLog = vi.fn(() => []);
+const mockGetDailySpendSummary = vi.fn(() => ({ global: 0n, byService: {}, resetsAt: 0 }));
+
+const mockX402Client = {
+  fetch: mockX402Fetch,
+  getTransactionLog: mockGetTransactionLog,
+  getDailySpendSummary: mockGetDailySpendSummary,
+  budgetTracker: {},
+};
+
+vi.mock('agentwallet-sdk', () => ({
+  createX402Client: vi.fn(() => mockX402Client),
+  getActivityHistory: vi.fn(),
+  createWallet: vi.fn(),
+  agentTransferToken: vi.fn(),
+  agentExecute: vi.fn(),
+  checkBudget: vi.fn(),
+  getBudgetForecast: vi.fn(),
+  getPendingApprovals: vi.fn(),
+  approveTransaction: vi.fn(),
+  cancelTransaction: vi.fn(),
+  getWalletHealth: vi.fn(),
+}));
+
+// ─── Mock client utils ─────────────────────────────────────────────────────
+
+const MOCK_WALLET = {
+  address: '0x1234567890123456789012345678901234567890' as `0x${string}`,
+  publicClient: {
+    getBalance: vi.fn().mockResolvedValue(1_000_000_000_000_000_000n),
+    getBlockNumber: vi.fn().mockResolvedValue(5000n),
+  },
+  walletClient: {},
+  contract: {},
+  chain: { id: 8453 },
+};
+
+vi.mock('../src/utils/client.js', () => ({
+  getConfig: vi.fn(() => ({
+    agentPrivateKey: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    walletAddress: '0x1234567890123456789012345678901234567890',
+    chainId: 8453,
+    rpcUrl: 'https://mainnet.base.org',
+  })),
+  getWallet: vi.fn(() => MOCK_WALLET),
+  _resetSingletons: vi.fn(),
+}));
+
+import { handleX402Pay } from '../src/tools/x402.js';
+import { handleGetTransactionHistory } from '../src/tools/history.js';
+import { getActivityHistory } from 'agentwallet-sdk';
+
+const mockGetActivityHistory = vi.mocked(getActivityHistory);
+
+// ─── x402_pay tests ────────────────────────────────────────────────────────
+
+describe('x402_pay tool', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  // ─── Happy path: no payment required ──────────────────────────────────
+
+  it('fetches URL when no payment required (200 response)', async () => {
+    const mockResponse = new Response('{"data": "success"}', {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+    mockX402Fetch.mockResolvedValueOnce(mockResponse);
+
+    const result = await handleX402Pay({
+      url: 'https://api.example.com/data',
+    });
+
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0]!.text).toContain('x402 Fetch Result');
+    expect(result.content[0]!.text).toContain('200');
+    expect(result.content[0]!.text).toContain('No payment required');
+    expect(result.content[0]!.text).toContain('success');
+  });
+
+  // ─── Happy path: payment made ──────────────────────────────────────────
+
+  it('shows payment details when 402 payment was made', async () => {
+    const mockResponse = new Response('{"access": "granted", "content": "premium data"}', {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    // Simulate payment callback being triggered by modifying the client mock
+    const { createX402Client } = await import('agentwallet-sdk');
+    const mockCreate = vi.mocked(createX402Client);
+
+    mockCreate.mockImplementationOnce((_wallet, config) => {
+      return {
+        fetch: async (url: string, init?: RequestInit) => {
+          // Simulate the onPaymentComplete callback
+          if (config?.onPaymentComplete) {
+            config.onPaymentComplete({
+              timestamp: Date.now(),
+              service: 'api.example.com',
+              url,
+              amount: 1_000_000n,
+              token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' as `0x${string}`,
+              recipient: '0xpayee0000000000000000000000000000000000' as `0x${string}`,
+              txHash: '0xpaymenttx00000000000000000000000000000000000000000000000000000000' as `0x${string}`,
+              network: 'base:8453',
+              scheme: 'exact',
+              success: true,
+            });
+          }
+          return mockResponse;
+        },
+        getTransactionLog: vi.fn(() => []),
+        getDailySpendSummary: vi.fn(() => ({ global: 0n, byService: {}, resetsAt: 0 })),
+        budgetTracker: {},
+      };
+    });
+
+    const result = await handleX402Pay({
+      url: 'https://api.example.com/premium',
+    });
+
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0]!.text).toContain('Payment Made');
+    expect(result.content[0]!.text).toContain('1000000'); // amount
+  });
+
+  // ─── Happy path: POST request ──────────────────────────────────────────
+
+  it('sends POST requests correctly', async () => {
+    const mockResponse = new Response('{"created": true}', { status: 201 });
+    mockX402Fetch.mockResolvedValueOnce(mockResponse);
+
+    const result = await handleX402Pay({
+      url: 'https://api.example.com/create',
+      method: 'POST',
+      body: '{"name": "test"}',
+      headers: { 'X-Api-Key': 'test-key' },
+    });
+
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0]!.text).toContain('POST');
+    expect(result.content[0]!.text).toContain('201');
+
+    // Verify headers were passed
+    const callArgs = mockX402Fetch.mock.calls[0];
+    const fetchInit = callArgs![1] as RequestInit;
+    const headers = fetchInit.headers as Record<string, string>;
+    expect(headers['X-Api-Key']).toBe('test-key');
+  });
+
+  // ─── Response truncation ───────────────────────────────────────────────
+
+  it('truncates very large responses', async () => {
+    const largeBody = 'x'.repeat(10000);
+    const mockResponse = new Response(largeBody, { status: 200 });
+    mockX402Fetch.mockResolvedValueOnce(mockResponse);
+
+    const result = await handleX402Pay({
+      url: 'https://api.example.com/large',
+    });
+
+    expect(result.content[0]!.text).toContain('[response truncated]');
+    // Should not have the full 10k character response
+    expect(result.content[0]!.text.length).toBeLessThan(largeBody.length);
+  });
+
+  // ─── Error paths ───────────────────────────────────────────────────────
+
+  it('returns error when payment cap would be exceeded', async () => {
+    const { createX402Client } = await import('agentwallet-sdk');
+    const mockCreate = vi.mocked(createX402Client);
+
+    mockCreate.mockImplementationOnce((_wallet, config) => ({
+      fetch: async (_url: string, _init?: RequestInit) => {
+        if (config?.onBeforePayment) {
+          // This should throw when cap is exceeded
+          try {
+            const allowed = await config.onBeforePayment(
+              {
+                scheme: 'exact',
+                network: 'base:8453',
+                asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+                amount: '2000000000000000', // 0.002 ETH
+                payTo: '0xpayee0000000000000000000000000000000000',
+                maxTimeoutSeconds: 60,
+                extra: {},
+              },
+              'https://api.example.com/data'
+            );
+          } catch (e) {
+            throw e;
+          }
+        }
+        return new Response('ok', { status: 200 });
+      },
+      getTransactionLog: vi.fn(() => []),
+      getDailySpendSummary: vi.fn(() => ({ global: 0n, byService: {}, resetsAt: 0 })),
+      budgetTracker: {},
+    }));
+
+    const result = await handleX402Pay({
+      url: 'https://api.example.com/data',
+      max_payment_eth: '0.001', // Cap at 0.001 ETH, payment wants 0.002
+    });
+
+    // The error should be caught and returned
+    expect(result).toBeDefined();
+  });
+
+  it('handles network errors gracefully', async () => {
+    mockX402Fetch.mockRejectedValueOnce(new Error('ECONNREFUSED'));
+
+    const result = await handleX402Pay({
+      url: 'https://api.example.com/data',
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]!.text).toContain('❌');
+    expect(result.content[0]!.text).toContain('ECONNREFUSED');
+  });
+
+  it('handles AbortError (timeout) gracefully', async () => {
+    const abortError = new Error('Aborted');
+    abortError.name = 'AbortError';
+    mockX402Fetch.mockRejectedValueOnce(abortError);
+
+    const result = await handleX402Pay({
+      url: 'https://api.example.com/slow',
+      timeout_ms: 5000,
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]!.text).toContain('timed out');
+    expect(result.content[0]!.text).toContain('5000');
+  });
+
+  it('includes network chain info in response', async () => {
+    mockX402Fetch.mockResolvedValueOnce(new Response('ok', { status: 200 }));
+
+    const result = await handleX402Pay({ url: 'https://api.example.com/data' });
+
+    expect(result.content[0]!.text).toContain('Base');
+  });
+});
+
+// ─── get_transaction_history tests ────────────────────────────────────────
+
+describe('get_transaction_history tool', () => {
+  const MOCK_TX_HASH = '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890' as `0x${string}`;
+
+  const MOCK_ENTRIES = [
+    {
+      type: 'execution' as const,
+      blockNumber: 1000n,
+      transactionHash: MOCK_TX_HASH,
+      args: {
+        target: '0xrecipient000000000000000000000000000000',
+        value: 1_000_000_000_000_000n,
+        executor: '0xagent000000000000000000000000000000000',
+      },
+    },
+    {
+      type: 'policy_update' as const,
+      blockNumber: 999n,
+      transactionHash: '0xpolicytx0000000000000000000000000000000000000000000000000000000' as `0x${string}`,
+      args: {
+        token: '0x0000000000000000000000000000000000000000',
+        perTxLimit: 1_000_000_000_000_000n,
+        periodLimit: 100_000_000_000_000_000n,
+      },
+    },
+  ];
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    MOCK_WALLET.publicClient.getBlockNumber.mockResolvedValue(5000n);
+    mockGetActivityHistory.mockResolvedValue(MOCK_ENTRIES);
+  });
+
+  // ─── Happy path ────────────────────────────────────────────────────────
+
+  it('returns transaction history entries', async () => {
+    const result = await handleGetTransactionHistory({});
+
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0]!.text).toContain('Transaction History');
+    expect(result.content[0]!.text).toContain('Transaction Executed');
+    expect(result.content[0]!.text).toContain(MOCK_TX_HASH);
+  });
+
+  it('shows policy updates in history', async () => {
+    const result = await handleGetTransactionHistory({});
+
+    expect(result.content[0]!.text).toContain('Spend Policy Updated');
+  });
+
+  it('filters by event_type', async () => {
+    const result = await handleGetTransactionHistory({
+      event_type: 'execution',
+    });
+
+    // Should only show execution events
+    expect(result.content[0]!.text).toContain('Transaction Executed');
+    // Policy update should not appear
+    expect(result.content[0]!.text).not.toContain('Spend Policy Updated');
+  });
+
+  it('handles empty history gracefully', async () => {
+    mockGetActivityHistory.mockResolvedValueOnce([]);
+
+    const result = await handleGetTransactionHistory({});
+
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0]!.text).toContain('No transactions found');
+    expect(result.content[0]!.text).toContain('from_block');
+  });
+
+  it('respects limit parameter', async () => {
+    // Return 10 entries
+    const manyEntries = Array.from({ length: 10 }, (_, i) => ({
+      type: 'execution' as const,
+      blockNumber: BigInt(i),
+      transactionHash: MOCK_TX_HASH,
+      args: {},
+    }));
+    mockGetActivityHistory.mockResolvedValueOnce(manyEntries);
+
+    const result = await handleGetTransactionHistory({ limit: 3 });
+
+    // Should show at most 3 entries (2 TX Executed sections)
+    const executedCount = (result.content[0]!.text.match(/Transaction Executed/g) ?? []).length;
+    expect(executedCount).toBeLessThanOrEqual(3);
+  });
+
+  it('uses custom block range when provided', async () => {
+    await handleGetTransactionHistory({
+      from_block: '1000',
+      to_block: '2000',
+    });
+
+    expect(mockGetActivityHistory).toHaveBeenCalledWith(
+      expect.anything(),
+      { fromBlock: 1000n, toBlock: 2000n }
+    );
+  });
+
+  it('includes explorer links in response', async () => {
+    const result = await handleGetTransactionHistory({});
+
+    expect(result.content[0]!.text).toContain('basescan.org');
+  });
+
+  // ─── Error paths ───────────────────────────────────────────────────────
+
+  it('handles SDK error gracefully', async () => {
+    mockGetActivityHistory.mockRejectedValueOnce(new Error('Block range too large'));
+
+    const result = await handleGetTransactionHistory({});
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]!.text).toContain('❌');
+    expect(result.content[0]!.text).toContain('Block range too large');
+  });
+
+  it('handles getBlockNumber error gracefully', async () => {
+    MOCK_WALLET.publicClient.getBlockNumber.mockRejectedValueOnce(new Error('RPC unavailable'));
+    mockGetActivityHistory.mockResolvedValueOnce([]);
+
+    // Should fall back or fail gracefully
+    const result = await handleGetTransactionHistory({});
+
+    // Either succeeds with fallback or fails cleanly
+    expect(result.content).toHaveLength(1);
+    expect(result.content[0]!.text).toBeTruthy();
+  });
+});

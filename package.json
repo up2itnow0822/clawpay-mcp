@@ -1,0 +1,68 @@
+{
+  "name": "clawpay-mcp",
+  "version": "1.1.0",
+  "description": "Non-custodial x402 MCP payment layer for AI agents — agents sign payments locally, funds never touch third-party infrastructure. Autonomous spend-limited crypto payments via Base network. v1.1.0: x402 V2 session payments — pay once per session, not per call.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "clawpay-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "claude_desktop_config.json",
+    ".env.example"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "prepublishOnly": "npm run clean && npm run build && npm run typecheck"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "agent-wallet",
+    "x402",
+    "crypto-payments",
+    "ai-agent",
+    "base",
+    "claude",
+    "cursor",
+    "windsurf",
+    "non-custodial",
+    "spend-limits",
+    "agentic-payments",
+    "autonomous-agent"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agentnexus/clawpay-mcp"
+  },
+  "author": "AgentNexus",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "agentwallet-sdk": "^2.0.1",
+    "viem": "2.46.0",
+    "zod": "^3.22.4"
+  },
+  "overrides": {
+    "viem": "2.46.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "typescript": "^5.3.3",
+    "vitest": "^4.0.18"
+  }
+}
