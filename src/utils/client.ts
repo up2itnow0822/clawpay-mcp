@@ -1,5 +1,5 @@
 /**
- * AgentWalletClient setup for Agent Wallet MCP.
+ * AgentWalletClient setup for ClawPay MCP.
  * Reads config from environment variables and creates a configured wallet instance.
  */
 import { createWalletClient, http, type Address, type Chain } from 'viem';
@@ -26,7 +26,7 @@ const DEFAULT_RPC: Record<number, string> = {
 
 // ─── Config types ──────────────────────────────────────────────────────────
 
-export interface AgentWalletMCPConfig {
+export interface ClawPayConfig {
   /** Agent hot wallet private key (0x-prefixed hex) */
   agentPrivateKey: `0x${string}`;
   /** Deployed AgentAccountV2 address */
@@ -47,7 +47,7 @@ export interface AgentWalletMCPConfig {
  * Load configuration from environment variables.
  * Only AGENT_PRIVATE_KEY and AGENT_WALLET_ADDRESS are required to get started.
  */
-export function loadConfig(): AgentWalletMCPConfig {
+export function loadConfig(): ClawPayConfig {
   const agentPrivateKey = process.env['AGENT_PRIVATE_KEY'];
   const walletAddress = process.env['AGENT_WALLET_ADDRESS'];
 
@@ -106,7 +106,7 @@ export type AgentWalletInstance = ReturnType<typeof createWallet>;
  * Create an AgentWallet instance from config.
  * Returns the wallet bound to the configured chain + RPC.
  */
-export function createAgentWallet(config: AgentWalletMCPConfig): AgentWalletInstance {
+export function createAgentWallet(config: ClawPayConfig): AgentWalletInstance {
   const chain = CHAIN_MAP[config.chainId];
   if (!chain) {
     throw new Error(`Unsupported chain ID: ${config.chainId}`);
@@ -135,14 +135,14 @@ export function createAgentWallet(config: AgentWalletMCPConfig): AgentWalletInst
 
 // ─── Singleton accessor ────────────────────────────────────────────────────
 
-let _config: AgentWalletMCPConfig | null = null;
+let _config: ClawPayConfig | null = null;
 let _wallet: AgentWalletInstance | null = null;
 
 /**
- * Get the singleton Agent Wallet MCP config (loaded once from env).
+ * Get the singleton ClawPay config (loaded once from env).
  * Throws a descriptive error if env vars are missing.
  */
-export function getConfig(): AgentWalletMCPConfig {
+export function getConfig(): ClawPayConfig {
   if (!_config) {
     _config = loadConfig();
   }

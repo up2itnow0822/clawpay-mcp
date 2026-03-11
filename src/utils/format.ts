@@ -1,5 +1,5 @@
 /**
- * Response formatters for Agent Wallet MCP tools.
+ * Response formatters for ClawPay MCP tools.
  * Converts on-chain bigint/hex values to human-readable MCP content.
  */
 import type { Address, Hash } from 'viem';
