@@ -4,7 +4,7 @@
  * x402 V2 introduced the concept of "wallet-based access & reusable sessions":
  * agents pay once to establish a session, then skip on-chain payment on every
  * subsequent call within that session. This module defines the data structures
- * that ClawPay MCP uses to implement this pattern non-custodially.
+ * that AgentPay MCP uses to implement this pattern non-custodially.
  *
  * Reference: https://www.x402.org/writing/x402-v2-launch
  *   "V2 protocol now includes the logic to support wallet-controlled sessions,

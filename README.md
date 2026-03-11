@@ -1,16 +1,18 @@
-# ClawPay MCP
+# AgentPay MCP
 
-> MCP server that gives any AI agent autonomous, spend-limited crypto payments via the Agent Wallet SDK on Base network.
+> _Formerly ClawPay MCP_ — Non-custodial x402 payment layer for AI agents on Base network.
 
-[![npm version](https://img.shields.io/npm/v/clawpay-mcp)](https://www.npmjs.com/package/clawpay-mcp)
+[![npm version](https://img.shields.io/npm/v/agentpay-mcp)](https://www.npmjs.com/package/agentpay-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-green)](https://modelcontextprotocol.io)
 
+> **Migration notice:** The npm package has been renamed from `clawpay-mcp` to `agentpay-mcp`. Install with `npm install -g agentpay-mcp`. The old package name will continue to redirect but receives no further updates.
+
 ---
 
-## What is ClawPay MCP?
+## What is AgentPay MCP?
 
-ClawPay MCP is a [Model Context Protocol](https://modelcontextprotocol.io) server that wraps the [Agent Wallet SDK (`agentwallet-sdk`)](https://www.npmjs.com/package/agentwallet-sdk) — enabling any MCP-compatible AI client (Claude Desktop, Cursor, Windsurf, etc.) to make on-chain payments with built-in spend limit enforcement.
+AgentPay MCP is a [Model Context Protocol](https://modelcontextprotocol.io) server that wraps the [Agent Wallet SDK (`agentwallet-sdk`)](https://www.npmjs.com/package/agentwallet-sdk) — enabling any MCP-compatible AI client (Claude Desktop, Cursor, Windsurf, etc.) to make on-chain payments with built-in spend limit enforcement.
 
 **Key properties:**
 
@@ -19,6 +21,8 @@ ClawPay MCP is a [Model Context Protocol](https://modelcontextprotocol.io) serve
 - ⚡ **x402-native** — Automatic HTTP 402 payment handling (pay-per-API-call, pay-per-token, etc.)
 - 🌐 **Base network** — Fast, cheap, EVM-compatible (Mainnet + Sepolia testnet)
 
+**Part of the [Agent Wallet](https://github.com/up2itnow0822/agent-wallet-sdk) ecosystem.**
+
 ---
 
 ## Quick Start
@@ -26,8 +30,8 @@ ClawPay MCP is a [Model Context Protocol](https://modelcontextprotocol.io) serve
 ### 1. Install
 
 ```bash
-npm install -g clawpay-mcp
-```text
+npm install -g agentpay-mcp
+```
 
 ### 2. Configure environment
 
@@ -41,7 +45,7 @@ AGENT_WALLET_ADDRESS=0x...  # Your deployed AgentAccountV2 address
 # Optional (defaults shown)
 CHAIN_ID=8453               # 8453 = Base Mainnet, 84532 = Base Sepolia
 RPC_URL=https://mainnet.base.org
-```text
+```
 
 > **Security note:** `AGENT_PRIVATE_KEY` is the agent's *hot wallet* signing key — not the owner key. On-chain spend limits protect your funds. Even if the key is compromised, the agent can only spend within your configured limits.
 
@@ -52,8 +56,8 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "clawpay": {
-      "command": "clawpay-mcp",
+    "agentpay": {
+      "command": "agentpay-mcp",
       "env": {
         "AGENT_PRIVATE_KEY": "0x...",
         "AGENT_WALLET_ADDRESS": "0x...",
@@ -62,11 +66,9 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
     }
   }
 }
-```text
+```
 
-Then restart Claude Desktop. You'll see the 🔧 ClawPay tools available in your conversation.
-
-See [`claude_desktop_config.json`](claude_desktop_config.json) for a ready-to-copy template.
+Then restart Claude Desktop. You'll see the 🔧 AgentPay tools available in your conversation.
 
 ---
 
@@ -84,7 +86,7 @@ Deploy a new AgentAccountV2 wallet via the factory contract.
   "factory_address": "0x...",
   "nft_contract_address": "0x..."
 }
-```text
+```
 
 **Output:**
 
@@ -102,7 +104,7 @@ Deploy a new AgentAccountV2 wallet via the factory contract.
   1. Set AGENT_WALLET_ADDRESS=0xabc... in your .env
   2. Use set_spend_policy to configure spending limits
   3. Fund the wallet with ETH or USDC
-```text
+```
 
 ---
 
@@ -116,7 +118,7 @@ Get wallet address, balance, spend limits, and remaining allowance.
 {
   "token": "0x0000000000000000000000000000000000000000"
 }
-```text
+```
 
 *`token` is optional — omit for native ETH.*
 
@@ -137,7 +139,7 @@ Get wallet address, balance, spend limits, and remaining allowance.
   Utilization:   30% 🟢 Healthy
   Period length: 24h
   Resets in:     18h 22m
-```text
+```
 
 ---
 
@@ -153,7 +155,7 @@ Send ETH or ERC20 tokens within spend limits.
   "amount_eth": "0.001",
   "memo": "Payment for API access"
 }
-```text
+```
 
 For ERC20 (e.g. USDC):
 
@@ -164,7 +166,7 @@ For ERC20 (e.g. USDC):
   "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
   "token_decimals": 6
 }
-```text
+```
 
 **Output:**
 
@@ -177,7 +179,7 @@ For ERC20 (e.g. USDC):
   TX Hash: 0xabc...
   🔗 https://basescan.org/tx/0xabc...
   📝 Memo: Payment for API access
-```text
+```
 
 > If the payment exceeds spend limits, it's automatically queued for your approval. Use `queue_approval` to manage the queue.
 
@@ -193,7 +195,7 @@ Check if a proposed payment is within autonomous limits before sending.
 {
   "amount_eth": "0.005"
 }
-```text
+```
 
 **Output:**
 
@@ -211,7 +213,7 @@ Check if a proposed payment is within autonomous limits before sending.
   Resets in:        18h 22m
 
 ✅ APPROVED — This payment can execute autonomously.
-```text
+```
 
 ---
 
@@ -223,32 +225,19 @@ Manage over-limit transactions queued for owner review.
 
 ```json
 { "action": "list" }
-```text
+```
 
 **Approve:**
 
 ```json
 { "action": "approve", "tx_id": "0" }
-```text
+```
 
 **Cancel:**
 
 ```json
 { "action": "cancel", "tx_id": "0" }
-```text
-
-**Output (list):**
-
-```text
-📋 Pending Approvals (1 transaction)
-─────────────────────────
-  Queue ID:   0
-  To:         0xrecipient...
-  Value:      0.05 ETH
-  Queued at:  2026-02-19T14:00:00.000Z
-
-Use action="approve" with tx_id to approve, or action="cancel" to cancel.
-```text
+```
 
 ---
 
@@ -264,25 +253,7 @@ Fetch a URL and automatically handle HTTP 402 Payment Required responses.
   "max_payment_eth": "0.001",
   "timeout_ms": 15000
 }
-```text
-
-**Output:**
-
-```text
-🌐 x402 Fetch Result
-
-  URL:     https://api.example.com/premium-data
-  Status:  200 OK
-  Network: Base Mainnet
-
-💳 Payment Made
-  Amount:    1000000 (base units)
-  Recipient: 0xpayee...
-  TX Hash:   0xpaymenttx...
-
-📄 Response Body
-{"access": "granted", "data": "...premium content..."}
-```text
+```
 
 ---
 
@@ -297,24 +268,7 @@ Retrieve on-chain transaction history from event logs.
   "limit": 10,
   "event_type": "execution"
 }
-```text
-
-**Output:**
-
-```text
-📜 Transaction History (2 entries)
-  Chain:       Base Mainnet
-  Block range: 4000 → latest
-  Filter:      execution
-
-⚡ Transaction Executed
-   Block:  4523
-   TX:     0xabc...
-   🔗 https://basescan.org/tx/0xabc...
-   To:     0xrecipient...
-   Value:  0.001 ETH
-   By:     0xagent...
-```text
+```
 
 ---
 
@@ -322,7 +276,7 @@ Retrieve on-chain transaction history from event logs.
 
 ### Non-Custodial Architecture
 
-ClawPay MCP wraps **AgentAccountV2** — a smart contract wallet that you own via an NFT. The security model:
+AgentPay MCP wraps **AgentAccountV2** — a smart contract wallet that you own via an NFT. The security model:
 
 1. **You own the NFT** → You own the wallet. If you transfer the NFT, the new holder controls the wallet.
 2. **Agent hot key** → `AGENT_PRIVATE_KEY` is a *limited* operator key. It can execute transactions only within the on-chain spend limits you set.
@@ -360,14 +314,12 @@ ClawPay MCP wraps **AgentAccountV2** — a smart contract wallet that you own vi
 
 ### Cursor / Windsurf
 
-Add to your MCP settings:
-
 ```json
 {
   "mcpServers": {
-    "clawpay": {
+    "agentpay": {
       "command": "npx",
-      "args": ["-y", "clawpay-mcp"],
+      "args": ["-y", "agentpay-mcp"],
       "env": {
         "AGENT_PRIVATE_KEY": "0x...",
         "AGENT_WALLET_ADDRESS": "0x...",
@@ -376,25 +328,17 @@ Add to your MCP settings:
     }
   }
 }
-```text
-
-### Using with a `.env` file
-
-```bash
-# Start with env file
-AGENT_PRIVATE_KEY=$(cat ~/.clawpay/key) \
-AGENT_WALLET_ADDRESS=0x... \
-clawpay-mcp
-```text
+```
 
 ---
 
-## Links
+## Ecosystem
 
-- **Agent Wallet SDK:** [agentwallet-sdk on npm](https://www.npmjs.com/package/agentwallet-sdk)
-- **x402 Protocol:** [x402.org](https://x402.org)
-- **Base Network:** [base.org](https://base.org)
-- **MCP Spec:** [modelcontextprotocol.io](https://modelcontextprotocol.io)
+- **[Agent Wallet SDK](https://www.npmjs.com/package/agentwallet-sdk)** — Non-custodial wallet SDK for AI agents
+- **[@agent-wallet/mastra-plugin](https://www.npmjs.com/package/@agent-wallet/mastra-plugin)** — Mastra framework integration
+- **[AgentPay MCP](https://www.npmjs.com/package/agentpay-mcp)** — This package (MCP server)
+- **[x402 Protocol](https://x402.org)** — HTTP 402 payment standard
+- **[Base Network](https://base.org)** — L2 chain
 
 ---
 
