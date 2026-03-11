@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
-    "agentwallet-sdk": "^2.0.1",
+    "agentwallet-sdk": "^5.0.0",
     "viem": "2.46.0",
     "zod": "^3.22.4"
   },
