@@ -1,6 +1,8 @@
-# ClawPay MCP
+# Agent Wallet MCP
 
-> MCP server that gives any AI agent autonomous, spend-limited crypto payments via the Agent Wallet SDK on Base network.
+> Formerly known as ClawPay MCP. Now part of the [Agent Wallet](https://github.com/up2itnow0822/agent-wallet-sdk) ecosystem.
+
+MCP server that gives any AI agent autonomous, spend-limited crypto payments via the Agent Wallet SDK on Base network.
 
 [![npm version](https://img.shields.io/npm/v/clawpay-mcp)](https://www.npmjs.com/package/clawpay-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -8,9 +10,9 @@
 
 ---
 
-## What is ClawPay MCP?
+## What is Agent Wallet MCP?
 
-ClawPay MCP is a [Model Context Protocol](https://modelcontextprotocol.io) server that wraps the [Agent Wallet SDK (`agentwallet-sdk`)](https://www.npmjs.com/package/agentwallet-sdk) — enabling any MCP-compatible AI client (Claude Desktop, Cursor, Windsurf, etc.) to make on-chain payments with built-in spend limit enforcement.
+Agent Wallet MCP is a [Model Context Protocol](https://modelcontextprotocol.io) server that wraps the [Agent Wallet SDK (`agentwallet-sdk`)](https://www.npmjs.com/package/agentwallet-sdk) — enabling any MCP-compatible AI client (Claude Desktop, Cursor, Windsurf, etc.) to make on-chain payments with built-in spend limit enforcement.
 
 **Key properties:**
 
@@ -27,7 +29,7 @@ ClawPay MCP is a [Model Context Protocol](https://modelcontextprotocol.io) serve
 
 ```bash
 npm install -g clawpay-mcp
-```text
+```
 
 ### 2. Configure environment
 
@@ -41,7 +43,7 @@ AGENT_WALLET_ADDRESS=0x...  # Your deployed AgentAccountV2 address
 # Optional (defaults shown)
 CHAIN_ID=8453               # 8453 = Base Mainnet, 84532 = Base Sepolia
 RPC_URL=https://mainnet.base.org
-```text
+```
 
 > **Security note:** `AGENT_PRIVATE_KEY` is the agent's *hot wallet* signing key — not the owner key. On-chain spend limits protect your funds. Even if the key is compromised, the agent can only spend within your configured limits.
 
@@ -52,7 +54,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "clawpay": {
+    "agent-wallet": {
       "command": "clawpay-mcp",
       "env": {
         "AGENT_PRIVATE_KEY": "0x...",
@@ -62,9 +64,9 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
     }
   }
 }
-```text
+```
 
-Then restart Claude Desktop. You'll see the 🔧 ClawPay tools available in your conversation.
+Then restart Claude Desktop. You'll see the 🔧 Agent Wallet tools available in your conversation.
 
 See [`claude_desktop_config.json`](claude_desktop_config.json) for a ready-to-copy template.
 
@@ -84,7 +86,7 @@ Deploy a new AgentAccountV2 wallet via the factory contract.
   "factory_address": "0x...",
   "nft_contract_address": "0x..."
 }
-```text
+```
 
 **Output:**
 
@@ -102,7 +104,7 @@ Deploy a new AgentAccountV2 wallet via the factory contract.
   1. Set AGENT_WALLET_ADDRESS=0xabc... in your .env
   2. Use set_spend_policy to configure spending limits
   3. Fund the wallet with ETH or USDC
-```text
+```
 
 ---
 
@@ -116,7 +118,7 @@ Get wallet address, balance, spend limits, and remaining allowance.
 {
   "token": "0x0000000000000000000000000000000000000000"
 }
-```text
+```
 
 *`token` is optional — omit for native ETH.*
 
@@ -137,7 +139,7 @@ Get wallet address, balance, spend limits, and remaining allowance.
   Utilization:   30% 🟢 Healthy
   Period length: 24h
   Resets in:     18h 22m
-```text
+```
 
 ---
 
@@ -153,7 +155,7 @@ Send ETH or ERC20 tokens within spend limits.
   "amount_eth": "0.001",
   "memo": "Payment for API access"
 }
-```text
+```
 
 For ERC20 (e.g. USDC):
 
@@ -164,7 +166,7 @@ For ERC20 (e.g. USDC):
   "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
   "token_decimals": 6
 }
-```text
+```
 
 **Output:**
 
@@ -177,7 +179,7 @@ For ERC20 (e.g. USDC):
   TX Hash: 0xabc...
   🔗 https://basescan.org/tx/0xabc...
   📝 Memo: Payment for API access
-```text
+```
 
 > If the payment exceeds spend limits, it's automatically queued for your approval. Use `queue_approval` to manage the queue.
 
@@ -193,7 +195,7 @@ Check if a proposed payment is within autonomous limits before sending.
 {
   "amount_eth": "0.005"
 }
-```text
+```
 
 **Output:**
 
@@ -211,7 +213,7 @@ Check if a proposed payment is within autonomous limits before sending.
   Resets in:        18h 22m
 
 ✅ APPROVED — This payment can execute autonomously.
-```text
+```
 
 ---
 
@@ -223,19 +225,19 @@ Manage over-limit transactions queued for owner review.
 
 ```json
 { "action": "list" }
-```text
+```
 
 **Approve:**
 
 ```json
 { "action": "approve", "tx_id": "0" }
-```text
+```
 
 **Cancel:**
 
 ```json
 { "action": "cancel", "tx_id": "0" }
-```text
+```
 
 **Output (list):**
 
@@ -248,7 +250,7 @@ Manage over-limit transactions queued for owner review.
   Queued at:  2026-02-19T14:00:00.000Z
 
 Use action="approve" with tx_id to approve, or action="cancel" to cancel.
-```text
+```
 
 ---
 
@@ -264,7 +266,7 @@ Fetch a URL and automatically handle HTTP 402 Payment Required responses.
   "max_payment_eth": "0.001",
   "timeout_ms": 15000
 }
-```text
+```
 
 **Output:**
 
@@ -282,7 +284,7 @@ Fetch a URL and automatically handle HTTP 402 Payment Required responses.
 
 📄 Response Body
 {"access": "granted", "data": "...premium content..."}
-```text
+```
 
 ---
 
@@ -297,7 +299,7 @@ Retrieve on-chain transaction history from event logs.
   "limit": 10,
   "event_type": "execution"
 }
-```text
+```
 
 **Output:**
 
@@ -314,7 +316,7 @@ Retrieve on-chain transaction history from event logs.
    To:     0xrecipient...
    Value:  0.001 ETH
    By:     0xagent...
-```text
+```
 
 ---
 
@@ -322,7 +324,7 @@ Retrieve on-chain transaction history from event logs.
 
 ### Non-Custodial Architecture
 
-ClawPay MCP wraps **AgentAccountV2** — a smart contract wallet that you own via an NFT. The security model:
+Agent Wallet MCP wraps **AgentAccountV2** — a smart contract wallet that you own via an NFT. The security model:
 
 1. **You own the NFT** → You own the wallet. If you transfer the NFT, the new holder controls the wallet.
 2. **Agent hot key** → `AGENT_PRIVATE_KEY` is a *limited* operator key. It can execute transactions only within the on-chain spend limits you set.
@@ -365,7 +367,7 @@ Add to your MCP settings:
 ```json
 {
   "mcpServers": {
-    "clawpay": {
+    "agent-wallet": {
       "command": "npx",
       "args": ["-y", "clawpay-mcp"],
       "env": {
@@ -376,22 +378,22 @@ Add to your MCP settings:
     }
   }
 }
-```text
+```
 
 ### Using with a `.env` file
 
 ```bash
 # Start with env file
-AGENT_PRIVATE_KEY=$(cat ~/.clawpay/key) \
+AGENT_PRIVATE_KEY=$(cat ~/.agent-wallet/key) \
 AGENT_WALLET_ADDRESS=0x... \
 clawpay-mcp
-```text
+```
 
 ---
 
 ## Links
 
-- **Agent Wallet SDK:** [agentwallet-sdk on npm](https://www.npmjs.com/package/agentwallet-sdk)
+- **Agent Wallet SDK:** [agentwallet-sdk on npm](https://www.npmjs.com/package/agentwallet-sdk) | [GitHub](https://github.com/up2itnow0822/agent-wallet-sdk)
 - **x402 Protocol:** [x402.org](https://x402.org)
 - **Base Network:** [base.org](https://base.org)
 - **MCP Spec:** [modelcontextprotocol.io](https://modelcontextprotocol.io)

@@ -1,7 +1,7 @@
 {
   "name": "clawpay-mcp",
   "version": "1.1.0",
-  "description": "Non-custodial x402 MCP payment layer for AI agents — agents sign payments locally, funds never touch third-party infrastructure. Autonomous spend-limited crypto payments via Base network. v1.1.0: x402 V2 session payments — pay once per session, not per call.",
+  "description": "Agent Wallet MCP Server — non-custodial x402 MCP payment layer for AI agents. Agents sign payments locally, funds never touch third-party infrastructure. Autonomous spend-limited crypto payments via Base network. v1.1.0: x402 V2 session payments — pay once per session, not per call.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
@@ -44,7 +44,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/agentnexus/clawpay-mcp"
+    "url": "https://github.com/up2itnow0822/clawpay-mcp"
   },
   "author": "AgentNexus",
   "engines": {

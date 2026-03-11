@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ClawPay MCP Server — Entry Point
+ * Agent Wallet MCP Server — Entry Point
  *
  * Exposes Agent Wallet SDK tools via the Model Context Protocol (MCP).
  * Compatible with Claude Desktop, Cursor, Windsurf, and any MCP client.
@@ -203,7 +203,7 @@ async function main(): Promise<void> {
 
   // Log to stderr (not stdout — stdout is reserved for MCP protocol)
   process.stderr.write(
-    `ClawPay MCP v1.1.0 started. ` +
+    `Agent Wallet MCP v1.1.0 started. ` +
     `Wallet: ${process.env['AGENT_WALLET_ADDRESS'] ?? '(not configured)'} | ` +
     `Chain: ${process.env['CHAIN_ID'] ?? '8453 (Base Mainnet)'} | ` +
     `Session TTL: ${process.env['SESSION_TTL_SECONDS'] ?? '3600'}s\n`
@@ -212,6 +212,6 @@ async function main(): Promise<void> {
 
 main().catch((error: unknown) => {
   const msg = error instanceof Error ? error.message : String(error);
-  process.stderr.write(`Fatal error starting ClawPay MCP: ${msg}\n`);
+  process.stderr.write(`Fatal error starting Agent Wallet MCP: ${msg}\n`);
   process.exit(1);
 });
