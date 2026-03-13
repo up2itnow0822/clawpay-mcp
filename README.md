@@ -293,6 +293,31 @@ AgentPay MCP wraps **AgentAccountV2** — a smart contract wallet that you own v
 | Over-spending a single service | x402 per-service budget controls |
 | Lost private key | Owner (NFT holder) remains in control |
 
+### Isolation Architecture — Why ContextCrush-Style Attacks Don't Apply
+
+In March 2026, Noma Security disclosed "ContextCrush" (CVE-2026-31841): MCP servers delivering poisoned documentation into AI coding assistants (Claude Desktop, Cursor, Windsurf, VS Code). The attack injects malicious instructions via the context window, causing the AI to execute destructive commands — including deleting local files.
+
+AgentPay MCP is architecturally immune to this class of attack. Here's why.
+
+**ContextCrush attack vector:**
+- A malicious MCP server (e.g. a documentation provider like Context7) returns poisoned content when the AI queries it
+- That content contains hidden instructions injected into the AI's context window
+- The AI, following what looks like legitimate documentation, executes the attacker's commands
+
+**Why AgentPay MCP doesn't have this surface:**
+
+1. **Payment-only tool surface** — AgentPay MCP exposes exactly 7 tools: `deploy_wallet`, `get_wallet_info`, `send_payment`, `check_spend_limit`, `queue_approval`, `x402_pay`, `get_transaction_history`. It does not fetch or return arbitrary content from external URLs. There is no documentation retrieval pathway, no web browsing tool, no file system access. The attack surface is bounded by the payment domain.
+
+2. **No content pass-through** — ContextCrush works because the compromised MCP server passes external content (poisoned docs) directly into the AI's context. AgentPay MCP only returns structured JSON objects describing payment state and transaction results. It cannot inject arbitrary text into the AI's reasoning context.
+
+3. **On-chain enforcement independent of context** — Even if an attacker somehow caused the AI to issue a malicious `send_payment` call, the on-chain spend limits enforce the authorization policy regardless of what the AI believes it's doing. The smart contract validates against the configured `SpendingPolicy` — it doesn't trust the AI's interpretation of the situation.
+
+4. **Process isolation** — AgentPay MCP runs as a separate process (`npx agentpay-mcp`). It communicates with the AI client via stdio, not shared memory. It cannot read or write files in your project directory, cannot access your clipboard, cannot execute shell commands. The process has no filesystem permissions beyond reading its own `.env` configuration.
+
+5. **No naming collisions** — CVE-2026-30856 (Tencent WeKnora) exploited tool naming collisions between MCP servers. AgentPay MCP's tool names are payment-specific and unlikely to collide with documentation or utility tools in legitimate agent setups.
+
+**Summary:** AgentPay MCP cannot be weaponized as a ContextCrush-style vector because it serves no content, accesses no external URLs, writes no files, and executes no shell commands. Its on-chain authorization layer enforces payment policy independently of AI context. Enterprise teams evaluating MCP governance should treat payment-specific, isolated MCP servers differently from general-purpose documentation or utility servers.
+
 ---
 
 ## Configuration
