@@ -1,6 +1,6 @@
 # AgentPay MCP
 
-> _Formerly ClawPay MCP_ — Non-custodial x402 payment layer for AI agents on Base network.
+> _Formerly ClawPay MCP_ — Non-custodial x402 payment layer for AI agents. Base (live), Etherlink, Polygon, and Stellar (coming Q2 2026).
 
 [![npm version](https://img.shields.io/npm/v/agentpay-mcp)](https://www.npmjs.com/package/agentpay-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -19,9 +19,40 @@ AgentPay MCP is a [Model Context Protocol](https://modelcontextprotocol.io) serv
 - 🔐 **Non-custodial** — You hold your keys. The wallet is a smart contract you own via NFT.
 - 💸 **Spend-limited** — On-chain limits cap what agents can spend per-tx and per-period. Over-limit transactions queue for your approval.
 - ⚡ **x402-native** — Automatic HTTP 402 payment handling (pay-per-API-call, pay-per-token, etc.)
-- 🌐 **Base network** — Fast, cheap, EVM-compatible (Mainnet + Sepolia testnet)
+- 🌐 **Multi-chain** — Base (live), Etherlink, Polygon, Stellar (coming Q2 2026)
 
 **Part of the [Agent Wallet](https://github.com/up2itnow0822/agent-wallet-sdk) ecosystem.**
+
+---
+
+## x402 Multi-Chain Support
+
+x402 is live on multiple chains, and AgentPay MCP is designed to be the abstraction layer so your agent doesn't need chain-specific payment code.
+
+| Chain | Status | Settlement | Notes |
+|-------|--------|------------|-------|
+| **Base** (Coinbase L2) | ✅ Live | USDC native | Primary chain. Production-ready. |
+| **Etherlink** (Tezos L2) | 🔜 Coming | USDC via bridge | Live on Etherlink since Mar 9, 2026. AgentPay integration in progress. |
+| **Polygon** | 🔜 Coming | USDC native | Agent CLI support live since Mar 8, 2026. AgentPay integration in progress. |
+| **Stellar** | 🔜 Coming | USDC native | x402 support live ~Mar 10, 2026. AgentPay integration in progress. |
+| **Circle Testnet** | 🧪 Testing | USDC (12 chains) | Multi-chain CCTP testnet for cross-chain USDC settlement. |
+
+**How multi-chain works with AgentPay MCP:**
+
+Your agent calls `x402_pay` with a URL. The MCP server detects the x402 payment requirements from the HTTP 402 response - including which chain the provider expects payment on. As we add chain support, the agent's integration stays the same: one tool call, automatic chain routing.
+
+```bash
+# Your agent code doesn't change when new chains are added
+x402_pay({ url: "https://api.example.com/data", max_payment_eth: "0.001" })
+```
+
+**Multi-chain roadmap:**
+1. Base - live now
+2. Etherlink - Q2 2026
+3. Polygon - Q2 2026
+4. Stellar - Q2 2026
+
+Want a specific chain prioritized? [Open an issue](https://github.com/up2itnow0822/agentpay-mcp/issues).
 
 ---
 
