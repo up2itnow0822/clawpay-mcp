@@ -1,6 +1,7 @@
 {
   "name": "clawpay-mcp",
-  "version": "1.3.0",
+  "version": "3.0.1",
+  "mcpName": "io.github.up2itnow0822/clawpay",
   "description": "AgentPay MCP Server — Non-custodial x402 payment layer for AI agents on Base network. Formerly ClawPay.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -44,7 +45,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/agentnexus/clawpay-mcp"
+    "url": "https://github.com/up2itnow0822/agentpay-mcp"
   },
   "author": "AgentNexus",
   "engines": {

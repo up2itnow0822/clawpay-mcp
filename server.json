@@ -1,0 +1,36 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.up2itnow0822/clawpay",
+  "description": "Non-custodial x402 payment MCP server for AI agents. Wallets, payments, and commerce on 17 chains.",
+  "repository": {
+    "url": "https://github.com/up2itnow0822/agentpay-mcp",
+    "source": "github"
+  },
+  "version": "3.0.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "clawpay-mcp",
+      "version": "3.0.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "description": "Private key for the agent wallet (hex string)",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": true,
+          "name": "AGENT_PRIVATE_KEY"
+        },
+        {
+          "description": "Base RPC URL for on-chain operations",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false,
+          "name": "BASE_RPC_URL"
+        }
+      ]
+    }
+  ]
+}
