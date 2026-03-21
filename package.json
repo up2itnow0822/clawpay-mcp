@@ -1,12 +1,12 @@
 {
-  "name": "clawpay-mcp",
-  "version": "3.0.1",
-  "mcpName": "io.github.up2itnow0822/clawpay",
-  "description": "AgentPay MCP Server — Non-custodial x402 payment layer for AI agents on Base network. Formerly ClawPay.",
+  "name": "agentpay-mcp",
+  "version": "3.1.0",
+  "mcpName": "io.github.up2itnow0822/agentpay",
+  "description": "AgentPay MCP Server — Non-custodial x402 payment layer for AI agents. Multi-chain wallets, spending limits, and machine-to-machine payments.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "clawpay-mcp": "dist/index.js"
+    "agentpay-mcp": "dist/index.js"
   },
   "files": [
     "dist",
