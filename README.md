@@ -1,6 +1,8 @@
 # AgentPay MCP
 
-> _Formerly ClawPay MCP_ — Non-custodial x402 payment layer for AI agents. Base (live), Etherlink, Polygon, and Stellar (coming Q2 2026).
+> **Patent Pending** — Non-Custodial Multi-Chain Financial Infrastructure System for Autonomous AI Agents (USPTO Provisional, filed March 2026)
+>
+> Non-custodial x402 payment layer for AI agents. Base (live), Etherlink, Polygon, and Stellar (coming Q2 2026).
 
 [![npm version](https://img.shields.io/npm/v/agentpay-mcp)](https://www.npmjs.com/package/agentpay-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
