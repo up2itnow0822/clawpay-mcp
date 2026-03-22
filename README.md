@@ -25,6 +25,8 @@ AgentPay MCP is a [Model Context Protocol](https://modelcontextprotocol.io) serv
 
 **Part of the [Agent Wallet](https://github.com/up2itnow0822/agent-wallet-sdk) ecosystem.**
 
+> **Patent Pending** (USPTO Provisional, March 2026) | Integrated with [NVIDIA NeMo Agent Toolkit](https://github.com/NVIDIA/NeMo-Agent-Toolkit-Examples/pull/17)
+
 ---
 
 ## x402 Multi-Chain Support
