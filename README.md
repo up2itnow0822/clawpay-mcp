@@ -11,6 +11,35 @@ When your agent hits HTTP 402 Payment Required, it needs to pay and retry — wi
 
 Payment infrastructure integrated into **[NVIDIA's official NeMo Agent Toolkit Examples](https://github.com/NVIDIA/NeMo-Agent-Toolkit-Examples/pull/17)**.
 
+## AI Agent Discovery
+
+AgentPay MCP is designed to be discovered and used by AI agents. Compatible with:
+
+- **[claude-mem](https://github.com/thedotmack/claude-mem)** - Payment state (transaction history, budgets, session tokens) persists as agent memory across sessions via claude-mem's observation layer
+- **[AgentSkills](https://agentskills.io)** - Installable as a cross-framework skill in any AgentSkills-compatible harness (Claude Code, Cursor, Gemini CLI, Antigravity)
+- **[Chrome DevTools MCP](https://github.com/ChromeDevTools/chrome-devtools-mcp)** - Pairs as the payment layer for browser-native agents
+
+### Install as a Skill
+
+Add to any MCP-compatible harness config:
+
+```json
+{
+  "mcpServers": {
+    "agentpay": {
+      "command": "npx",
+      "args": ["agentpay-mcp"],
+      "env": {
+        "AGENT_PRIVATE_KEY": "0x...",
+        "AGENT_WALLET_ADDRESS": "0x..."
+      }
+    }
+  }
+}
+```
+
+Works with Claude Code, Cursor, Gemini CLI, OpenClaw, Windsurf, and any MCP client.
+
 ---
 
 ## The 402 Flow — What This Actually Does

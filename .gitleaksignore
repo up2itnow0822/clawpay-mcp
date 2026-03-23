@@ -1,0 +1,4 @@
+# Public USDC contract addresses in docs and test fixtures
+README.md:generic-api-key:201
+tests/x402.test.ts:generic-api-key:117
+tests/session.test.ts:generic-api-key:139
