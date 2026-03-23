@@ -1,8 +1,8 @@
 {
   "name": "agentpay-mcp",
-  "version": "3.1.0",
+  "version": "4.0.0",
   "mcpName": "io.github.up2itnow0822/agentpay",
-  "description": "AgentPay MCP Server — Non-custodial x402 payment layer for AI agents. Multi-chain wallets, spending limits, and machine-to-machine payments.",
+  "description": "AgentPay MCP Server — Non-custodial x402 payment layer for AI agents. Multi-chain wallets, spending limits, and machine-to-machine payments. Patent Pending.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
@@ -23,7 +23,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts",
+    "lint": "eslint src/",
     "prepublishOnly": "npm run clean && npm run build && npm run typecheck"
   },
   "keywords": [
@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
-    "agentwallet-sdk": "^5.2.0",
+    "agentwallet-sdk": "^6.0.0",
     "viem": "2.46.0",
     "zod": "^3.22.4"
   },
@@ -62,8 +62,12 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/parser": "^8.57.1",
     "@vitest/coverage-v8": "^4.0.18",
+    "eslint": "^10.1.0",
     "typescript": "^5.3.3",
+    "typescript-eslint": "^8.57.1",
     "vitest": "^4.0.18"
   }
 }

@@ -49,11 +49,58 @@ import {
   X402SessionEndSchema,
 } from './tools/session.js';
 
+// ─── Tool imports (v4.0.0 — tokens, transfers, swap, bridge, budget, identity, escrow) ──
+
+import {
+  lookupTokenTool,
+  handleLookupToken,
+  LookupTokenSchema,
+  addCustomTokenTool,
+  handleAddCustomToken,
+  AddCustomTokenSchema,
+  listChainTokensTool,
+  handleListChainTokens,
+  ListChainTokensSchema,
+} from './tools/tokens.js';
+
+import {
+  sendTokenTool,
+  handleSendToken,
+  SendTokenSchema,
+  getBalancesTool,
+  handleGetBalances,
+  GetBalancesSchema,
+} from './tools/transfers.js';
+
+import { swapTokensTool, handleSwapTokens, SwapTokensSchema } from './tools/swap.js';
+
+import { bridgeUsdcTool, handleBridgeUsdc, BridgeUsdcSchema } from './tools/bridge.js';
+
+import {
+  setSpendPolicyTool,
+  handleSetSpendPolicy,
+  SetSpendPolicySchema,
+  checkBudgetTool,
+  handleCheckBudget,
+  CheckBudgetSchema,
+} from './tools/budget.js';
+
+import {
+  verifyAgentIdentityTool,
+  handleVerifyAgentIdentity,
+  VerifyAgentIdentitySchema,
+  getReputationTool,
+  handleGetReputation,
+  GetReputationSchema,
+} from './tools/identity.js';
+
+import { createEscrowTool, handleCreateEscrow, CreateEscrowSchema } from './tools/escrow.js';
+
 // ─── Server configuration ──────────────────────────────────────────────────
 
 const SERVER_INFO = {
   name: 'agentpay-mcp',
-  version: '1.1.0',
+  version: '4.0.0',
 };
 
 const SERVER_CAPABILITIES = {
@@ -76,6 +123,25 @@ const ALL_TOOLS = [
   x402SessionFetchTool,
   x402SessionStatusTool,
   x402SessionEndTool,
+  // v4.0.0 — tokens
+  lookupTokenTool,
+  addCustomTokenTool,
+  listChainTokensTool,
+  // v4.0.0 — transfers
+  sendTokenTool,
+  getBalancesTool,
+  // v4.0.0 — swap
+  swapTokensTool,
+  // v4.0.0 — bridge
+  bridgeUsdcTool,
+  // v4.0.0 — budget
+  setSpendPolicyTool,
+  checkBudgetTool,
+  // v4.0.0 — identity
+  verifyAgentIdentityTool,
+  getReputationTool,
+  // v4.0.0 — escrow
+  createEscrowTool,
 ];
 
 // ─── Server initialization ─────────────────────────────────────────────────
@@ -156,6 +222,80 @@ server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest)
       case 'x402_session_end': {
         const input = X402SessionEndSchema.parse(args);
         return handleX402SessionEnd(input);
+      }
+
+      // ── v4.0.0 — tokens ───────────────────────────────────────────────
+
+      case 'lookup_token': {
+        const input = LookupTokenSchema.parse(args);
+        return handleLookupToken(input);
+      }
+
+      case 'add_custom_token': {
+        const input = AddCustomTokenSchema.parse(args);
+        return handleAddCustomToken(input);
+      }
+
+      case 'list_chain_tokens': {
+        const input = ListChainTokensSchema.parse(args);
+        return handleListChainTokens(input);
+      }
+
+      // ── v4.0.0 — transfers ────────────────────────────────────────────
+
+      case 'send_token': {
+        const input = SendTokenSchema.parse(args);
+        return handleSendToken(input);
+      }
+
+      case 'get_balances': {
+        const input = GetBalancesSchema.parse(args ?? {});
+        return handleGetBalances(input);
+      }
+
+      // ── v4.0.0 — swap ─────────────────────────────────────────────────
+
+      case 'swap_tokens': {
+        const input = SwapTokensSchema.parse(args);
+        return handleSwapTokens(input);
+      }
+
+      // ── v4.0.0 — bridge ───────────────────────────────────────────────
+
+      case 'bridge_usdc': {
+        const input = BridgeUsdcSchema.parse(args);
+        return handleBridgeUsdc(input);
+      }
+
+      // ── v4.0.0 — budget ───────────────────────────────────────────────
+
+      case 'set_spend_policy': {
+        const input = SetSpendPolicySchema.parse(args ?? {});
+        return handleSetSpendPolicy(input);
+      }
+
+      case 'check_budget': {
+        const input = CheckBudgetSchema.parse(args ?? {});
+        return handleCheckBudget(input);
+      }
+
+      // ── v4.0.0 — identity ─────────────────────────────────────────────
+
+      case 'verify_agent_identity': {
+        const input = VerifyAgentIdentitySchema.parse(args);
+        return handleVerifyAgentIdentity(input);
+      }
+
+      case 'get_reputation': {
+        const input = GetReputationSchema.parse(args);
+        return handleGetReputation(input);
+      }
+
+      // ── v4.0.0 — escrow ───────────────────────────────────────────────
+
+      case 'create_escrow': {
+        const input = CreateEscrowSchema.parse(args);
+        return handleCreateEscrow(input);
       }
 
       default:
