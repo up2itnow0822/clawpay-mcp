@@ -3,3 +3,4 @@ dist/
 .env
 *.tgz
 coverage/
+# Commit signing verification test - Mon Mar 23 12:09:55 CDT 2026
