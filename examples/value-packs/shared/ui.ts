@@ -81,7 +81,7 @@ export function printPaid(label: string, costUsd: number): void {
   console.log(`  ${C.yellow}[PAID $${costUsd.toFixed(4)}]${C.reset} ${label}`);
 }
 
-export function printSpinner(message: string): NodeJS.Timer {
+export function printSpinner(message: string): ReturnType<typeof setInterval> {
   const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
   let i = 0;
   process.stdout.write(`  ${C.cyan}${frames[0]}${C.reset} ${message}`);
@@ -92,7 +92,7 @@ export function printSpinner(message: string): NodeJS.Timer {
   return timer;
 }
 
-export function clearSpinner(timer: NodeJS.Timer): void {
+export function clearSpinner(timer: ReturnType<typeof setInterval>): void {
   clearInterval(timer);
   process.stdout.write('\r');
 }
