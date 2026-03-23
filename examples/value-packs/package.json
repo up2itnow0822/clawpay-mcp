@@ -1,0 +1,25 @@
+{
+  "name": "agentpay-value-packs",
+  "version": "1.0.0",
+  "description": "Drop-in value packs — copy, run, and customize x402 payment flows for AI agents",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "paid-api": "npx tsx paid-api-agent.ts",
+    "research": "npx tsx research-agent.ts",
+    "automation": "npx tsx automation-agent.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "agentpay-mcp": "^4.0.0",
+    "agentwallet-sdk": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
