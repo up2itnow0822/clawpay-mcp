@@ -437,6 +437,9 @@ The agent's signing key (`AGENT_PRIVATE_KEY`) can only transact within limits se
 **x402 sessions:**  
 Session tokens are ECDSA-signed claims. Any x402 V2 server can independently verify them — no central session store required.
 
+**Minimal dependency footprint:**  
+AgentPay MCP has **zero LiteLLM dependency**. The entire server runs on `viem` (Ethereum client), `@modelcontextprotocol/sdk`, and a handful of auditable packages — no heavyweight LLM routing layers in the dependency tree. This matters: on March 24, 2026, LiteLLM versions 1.82.7 and 1.82.8 on PyPI were [confirmed compromised](https://github.com/berriai/litellm/issues) in a supply chain attack targeting AI agent infrastructure. Any MCP server that depends on LiteLLM (directly or transitively) was exposed. AgentPay MCP was not — because payment infrastructure should have the smallest possible attack surface.
+
 ---
 
 ## Architecture
