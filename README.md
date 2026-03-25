@@ -11,6 +11,19 @@ When your agent hits HTTP 402 Payment Required, it needs to pay and retry — wi
 
 Payment infrastructure integrated into **[NVIDIA's official NeMo Agent Toolkit Examples](https://github.com/NVIDIA/NeMo-Agent-Toolkit-Examples/pull/17)**.
 
+## Security & Dependencies
+
+AgentPay MCP is built for enterprise MCP deployments where supply chain security matters.
+
+- **Zero LiteLLM dependency.** No direct or transitive dependency on LiteLLM or any heavyweight LLM routing layer. When LiteLLM versions 1.82.7-1.82.8 were [compromised on PyPI](https://github.com/berriai/litellm/issues) (March 2026), AgentPay MCP users were unaffected.
+- **Auditable, minimal dependency tree.** The server runs on `viem`, `@modelcontextprotocol/sdk`, and a small set of auditable npm packages. No PyPI. No Python runtime required.
+- **Enterprise trust signal.** Integrated into [NVIDIA's official NeMo Agent Toolkit Examples](https://github.com/NVIDIA/NeMo-Agent-Toolkit-Examples/pull/17) (PR #17, merged). NVIDIA's review process validated the security posture before merge.
+- **Non-custodial architecture.** Private keys never leave the local machine. On-chain spend caps enforce limits even if the agent or its key is compromised.
+
+If your security team is auditing MCP server dependencies after the LiteLLM incident, `npm ls` on agentpay-mcp gives you a short, reviewable tree with zero Python supply chain exposure.
+
+---
+
 ## AI Agent Discovery
 
 AgentPay MCP is designed to be discovered and used by AI agents. Compatible with:
