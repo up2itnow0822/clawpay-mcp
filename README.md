@@ -11,6 +11,30 @@ When your agent hits HTTP 402 Payment Required, it needs to pay and retry — wi
 
 Payment infrastructure integrated into **[NVIDIA's official NeMo Agent Toolkit Examples](https://github.com/NVIDIA/NeMo-Agent-Toolkit-Examples/pull/17)**.
 
+## Why Trust Matters
+
+McKinsey's 2026 AI Trust Maturity Survey quantifies what builders already feel: agent capability has outpaced agent governance.
+
+| Finding | Stat |
+|---------|------|
+| Enterprises that formally approve agents before deployment | **14.4%** |
+| Enterprises reporting at least one agent security incident | **88%** |
+| Enterprises confident in agent IAM for payments | **18%** |
+
+The trust gap is the deployment gap. Enterprises aren't saying agents don't work — they're saying the oversight infrastructure (approval workflows, spending guardrails, identity verification, audit trails) hasn't kept pace.
+
+AgentPay MCP addresses this directly:
+
+- **Human-approval mode** — transactions above your threshold require explicit human confirmation before executing
+- **On-chain spend caps** — enforced by smart contract, not application code. The agent cannot override them.
+- **Full audit trail** — every payment attempt logged with merchant, amount, timestamp, approval status
+- **Fail-closed** — any policy engine error produces rejection, never approval
+- **Non-custodial** — private keys never leave the local machine
+
+When 88% of enterprises have had an agent security incident, "trust by default" is not a viable architecture. AgentPay MCP is built for "verify, then trust" — which is the only model that scales.
+
+---
+
 ## Security & Dependencies
 
 AgentPay MCP is built for enterprise MCP deployments where supply chain security matters.
@@ -452,6 +476,21 @@ Session tokens are ECDSA-signed claims. Any x402 V2 server can independently ver
 
 **Minimal dependency footprint:**  
 AgentPay MCP has **zero LiteLLM dependency**. The entire server runs on `viem` (Ethereum client), `@modelcontextprotocol/sdk`, and a handful of auditable packages — no heavyweight LLM routing layers in the dependency tree. This matters: on March 24, 2026, LiteLLM versions 1.82.7 and 1.82.8 on PyPI were [confirmed compromised](https://github.com/berriai/litellm/issues) in a supply chain attack targeting AI agent infrastructure. Any MCP server that depends on LiteLLM (directly or transitively) was exposed. AgentPay MCP was not — because payment infrastructure should have the smallest possible attack surface.
+
+---
+
+## MCP 2026 Compliance
+
+AgentPay MCP aligns with the emerging MCP security standards for 2026, including CoSAI (Coalition for Secure AI) threat categories and OAuth 2.1 requirements.
+
+**Security posture documentation:** See [`docs/security-posture.md`](docs/security-posture.md) for the full compliance matrix covering:
+
+- **CoSAI T9 (Financial Fraud)** — On-chain spend caps, merchant allowlists, and human-approval gates mitigate unauthorized agent spending
+- **CoSAI T10 (Identity Spoofing)** — ERC-8004 agent identity verification + non-custodial key management prevent identity-based attacks
+- **OAuth 2.1 + PKCE** — MCP server authentication supports OAuth 2.1 with PKCE for enterprise SSO integration (Azure AD, Okta)
+- **MCP Audit Logging** — Every tool invocation logged with timestamp, parameters, outcome, and transaction hash (where applicable)
+
+For enterprise security teams evaluating MCP servers: the security posture document provides the artifact your audit process needs.
 
 ---
 
