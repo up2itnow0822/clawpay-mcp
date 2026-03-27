@@ -35,6 +35,26 @@ When 88% of enterprises have had an agent security incident, "trust by default" 
 
 ---
 
+## Why Cost Governance Matters for MCP Agents
+
+The Model Context Protocol gives agents access to powerful tools — but the protocol itself has no built-in mechanism for controlling what those tools cost. This isn't a theoretical gap. WorkOS's 2026 guide to MCP security explicitly identifies **rate limiting, cost attribution, and per-call spend caps** as unsolved problems at the MCP protocol level. Every MCP server can charge. No MCP client enforces budgets.
+
+The result: an agent with access to 10 MCP servers can accumulate unbounded costs across sessions, with no standard way to attribute spend per tool, cap exposure per call, or halt runaway loops before they drain a wallet.
+
+AgentPay MCP closes this gap at the infrastructure layer:
+
+| MCP Cost Governance Gap | AgentPay MCP Solution |
+|---|---|
+| No per-call spend caps in the MCP spec | **On-chain per-transaction caps** — enforced by smart contract, not application logic |
+| No cost attribution across MCP servers | **Full transaction history** with merchant, amount, timestamp, and tool context per call |
+| No rate limiting for paid tool invocations | **Daily aggregate spend limits** — hard ceiling regardless of how many tools or sessions run |
+| No human oversight mechanism in the protocol | **Human-in-the-loop approval** — transactions above threshold queue for explicit human review |
+| No simulation/dry-run for cost estimation | **Simulation mode** — preview transaction cost and recipient before committing funds |
+
+If you're building agents that interact with paid APIs, MCP spend limits and MCP cost governance aren't optional — they're the difference between a demo and a production deployment. AgentPay MCP is the open-source reference implementation for solving this at the protocol's edge.
+
+---
+
 ## Security & Dependencies
 
 AgentPay MCP is built for enterprise MCP deployments where supply chain security matters.
