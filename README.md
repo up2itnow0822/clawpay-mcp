@@ -565,6 +565,49 @@ We support the open x402 standard. Our filing is defensive — to prevent hostil
 
 ---
 
+## x402 Ecosystem — 75M+ Transactions, Cloudflare Native Support
+
+agentpay-mcp is built on the [x402 HTTP payment standard](https://x402.org), which has now processed **75M+ transactions on Base mainnet** — primarily through Coinbase Agentic Wallets and developer integrations.
+
+**Cloudflare has added native x402 support** to its Agents SDK and MCP server runtime, meaning any Cloudflare Worker-hosted agent can now make x402 payments natively. Google, Circle, and Stripe are all actively integrating x402 into their agent ecosystems.
+
+agentpay-mcp is the **open-source governance layer** on top of this infrastructure: while x402 handles the payment protocol, agentpay-mcp adds the trust controls that production agents require — HITL approval queues, spend caps, recipient allowlists, and on-chain audit trails.
+
+| x402 Ecosystem | Status |
+|---|---|
+| Base mainnet transactions | 75M+ |
+| Cloudflare Agents SDK | ✅ Native support |
+| Cloudflare MCP servers | ✅ Native support |
+| Coinbase Agentic Wallets | ✅ Primary client |
+| Google / Circle / Stripe | 🔄 Active integration |
+| agentpay-mcp governance layer | ✅ Open-source |
+
+---
+
+## EU AI Act Compliance
+
+**Enforcement deadline: August 2, 2026.** AI systems that execute or facilitate financial transactions are classified as **high-risk** under EU AI Act Annex III. High-risk classification requires:
+
+- ✅ **Human oversight mechanisms** — mandatory human review and override capability
+- ✅ **Transparency and explainability** — auditable transaction records
+- ✅ **Access controls** — spend limits that cannot be bypassed by the agent
+- ✅ **Technical documentation** — conformity assessment support
+
+agentpay-mcp satisfies all four requirements out of the box:
+
+| Requirement | agentpay-mcp Feature |
+|---|---|
+| Human oversight | `queue_approval` — transactions above threshold require explicit human approval before execution |
+| Audit trail | `get_transaction_history` — full on-chain event log, immutable, verifiable on basescan.org |
+| Spend controls | `set_spend_policy` — per-tx caps and daily limits enforced at the smart contract layer |
+| Scope restriction | Recipient allowlists — agent cannot send to unapproved addresses regardless of instructions |
+
+European enterprises deploying agent systems that touch payments have **~150 days** to implement compliant human oversight and audit controls. agentpay-mcp is the fastest path to EU AI Act compliance for MCP-compatible agent deployments.
+
+> **Fines for non-compliance:** Up to €35M or 7% of global annual revenue. Germany published its national enforcement bill in February 2026.
+
+---
+
 ## License
 
 MIT © [AI Agent Economy](https://ai-agent-economy.com)
