@@ -1,10 +1,10 @@
 /**
- * identity.ts — verify_agent_identity, get_reputation tools.
+ * identity.ts — verify_agent_identity, get_reputation, verify_agent_uaid tools.
  *
- * Wraps agentwallet-sdk v6 ERC8004Client + ReputationClient.
+ * Wraps agentwallet-sdk v6 ERC8004Client + ReputationClient + UAIDResolver.
  */
 import { z } from 'zod'
-import { ERC8004Client, ReputationClient } from 'agentwallet-sdk'
+import { ERC8004Client, ReputationClient, UAIDResolver } from 'agentwallet-sdk'
 import type { Address } from 'viem'
 import { getConfig } from '../utils/client.js'
 import { textContent, formatError } from '../utils/format.js'
@@ -190,6 +190,87 @@ export async function handleGetReputation(
   } catch (error: unknown) {
     return {
       content: [textContent(formatError(error, 'get_reputation'))],
+      isError: true,
+    }
+  }
+}
+
+// ─── verify_agent_uaid ─────────────────────────────────────────────────────
+
+export const VerifyAgentUAIDSchema = z.object({
+  uaid: z
+    .string()
+    .describe('Universal Agent Identifier (UAID) to verify — works across all chains'),
+})
+
+export type VerifyAgentUAIDInput = z.infer<typeof VerifyAgentUAIDSchema>
+
+export const verifyAgentUAIDTool = {
+  name: 'verify_agent_uaid',
+  description:
+    'Verify an agent\'s identity using a Universal Agent Identifier (UAID). ' +
+    'Works across all chains — EVM (ERC-8004), Hedera, Solana, and off-chain agents. ' +
+    'Returns identity details, payment address, and trust score from the HOL Registry.',
+  inputSchema: {
+    type: 'object' as const,
+    properties: {
+      uaid: {
+        type: 'string',
+        description: 'Universal Agent Identifier (e.g., uaid:aid:eip155:8453:0x...;uid=42;proto=erc8004)',
+      },
+    },
+    required: ['uaid'],
+  },
+}
+
+export async function handleVerifyAgentUAID(
+  input: VerifyAgentUAIDInput
+): Promise<{ content: Array<{ type: 'text'; text: string }>; isError?: boolean }> {
+  try {
+    const resolver = new UAIDResolver()
+
+    const parsed = UAIDResolver.parseUAID(input.uaid)
+    if (!parsed) {
+      return {
+        content: [
+          textContent(
+            JSON.stringify({
+              verified: false,
+              uaid: input.uaid,
+              error: 'Invalid UAID format. Expected: uaid:aid:<identifier>;uid=<id>;proto=<protocol>',
+            })
+          ),
+        ],
+      }
+    }
+
+    const result = await resolver.verify(input.uaid)
+
+    return {
+      content: [
+        textContent(
+          JSON.stringify({
+            verified: result.verified,
+            uaid: input.uaid,
+            protocol: result.protocol,
+            trustScore: result.trustScore,
+            identity: result.identity
+              ? {
+                  agentId: result.identity.agentId,
+                  owner: result.identity.owner,
+                  paymentAddress: result.identity.paymentAddress,
+                  chain: result.identity.chain,
+                  agentURI: result.identity.agentURI,
+                }
+              : null,
+            error: result.error ?? null,
+          })
+        ),
+      ],
+    }
+  } catch (error: unknown) {
+    return {
+      content: [textContent(formatError(error, 'verify_agent_uaid'))],
       isError: true,
     }
   }

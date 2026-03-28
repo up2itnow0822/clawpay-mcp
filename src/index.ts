@@ -92,6 +92,9 @@ import {
   getReputationTool,
   handleGetReputation,
   GetReputationSchema,
+  verifyAgentUAIDTool,
+  handleVerifyAgentUAID,
+  VerifyAgentUAIDSchema,
 } from './tools/identity.js';
 
 import { createEscrowTool, handleCreateEscrow, CreateEscrowSchema } from './tools/escrow.js';
@@ -140,6 +143,8 @@ const ALL_TOOLS = [
   // v4.0.0 — identity
   verifyAgentIdentityTool,
   getReputationTool,
+  // v6.1.0 — cross-chain identity (UAID)
+  verifyAgentUAIDTool,
   // v4.0.0 — escrow
   createEscrowTool,
 ];
@@ -289,6 +294,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest)
       case 'get_reputation': {
         const input = GetReputationSchema.parse(args);
         return handleGetReputation(input);
+      }
+
+      // ── v6.1.0 — cross-chain identity (UAID) ─────────────────────────
+
+      case 'verify_agent_uaid': {
+        const input = VerifyAgentUAIDSchema.parse(args);
+        return handleVerifyAgentUAID(input);
       }
 
       // ── v4.0.0 — escrow ───────────────────────────────────────────────
