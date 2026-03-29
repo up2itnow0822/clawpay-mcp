@@ -7,11 +7,13 @@
 
 **The MCP server that lets your agent pay for APIs safely.**
 
+**agentpay-mcp is the human-first trust and policy layer above commodity execution rails (x402, ACP, UCP).** While x402 settles $600M annualized — with AI agents driving 40% of protocol activity (March 2026) — the missing piece isn't payment execution. It's governance: who approved it, how much can be spent, and what happens when the agent tries to exceed its budget. That's what agentpay-mcp provides.
+
 When your agent hits HTTP 402 Payment Required, it needs to pay and retry — with your approval, within limits you set. AgentPay MCP is a Model Context Protocol server that gives Claude, Cursor, and any MCP-compatible agent a payment wallet with hard spend caps, human-approval mode, and a full on-chain audit trail.
 
 The MCP ecosystem now has 97M+ monthly downloads and 10,000+ active servers — agentpay-mcp is the only MCP-native full payment execution layer.
 
-Payment infrastructure integrated into **[NVIDIA's official NeMo Agent Toolkit Examples](https://github.com/NVIDIA/NeMo-Agent-Toolkit-Examples/pull/17)**.
+✅ Integrated into **[NVIDIA/NeMo-Agent-Toolkit-Examples](https://github.com/NVIDIA/NeMo-Agent-Toolkit-Examples/pull/17)** (PR #17 merged) — payment infrastructure for NVIDIA's official agent toolkit.
 
 ## Why Trust Matters
 
