@@ -9,6 +9,8 @@
 
 When your agent hits HTTP 402 Payment Required, it needs to pay and retry — with your approval, within limits you set. AgentPay MCP is a Model Context Protocol server that gives Claude, Cursor, and any MCP-compatible agent a payment wallet with hard spend caps, human-approval mode, and a full on-chain audit trail.
 
+The MCP ecosystem now has 97M+ monthly downloads and 10,000+ active servers — agentpay-mcp is the only MCP-native full payment execution layer.
+
 Payment infrastructure integrated into **[NVIDIA's official NeMo Agent Toolkit Examples](https://github.com/NVIDIA/NeMo-Agent-Toolkit-Examples/pull/17)**.
 
 ## Why Trust Matters
@@ -562,6 +564,33 @@ npm test
 **Patent Pending** — USPTO provisional application filed March 2026: "Non-Custodial Multi-Chain Financial Infrastructure System for Autonomous AI Agents."
 
 We support the open x402 standard. Our filing is defensive — to prevent hostile monopolization of open payment rails, not to restrict builders using open standards.
+
+---
+
+## Vercel x402-mcp Interop
+
+agentpay-mcp is fully compatible with Vercel's [`x402-mcp`](https://www.npmjs.com/package/x402-mcp) package. If you're using Vercel's `paidTool()` to monetize MCP tools, agentpay-mcp works as the client-side payment layer — your agent pays x402 invoices from `paidTool()` endpoints automatically via `x402_pay`.
+
+**What agentpay-mcp adds on top of x402-mcp:**
+- **Multi-rail payments** — route through x402 (USDC on-chain) or Stripe Machine Payments Protocol (fiat) depending on the merchant
+- **Spend governance** — per-tx caps, daily limits, and human-approval queues that `paidTool()` endpoints don't enforce client-side
+- **Multi-chain x402 v2** — pay on Base, Solana, or Polygon (x402 v2 supports all three networks natively)
+
+Use Vercel x402-mcp on the server side to monetize your tools. Use agentpay-mcp on the client side to pay for tools safely.
+
+---
+
+## Circle Nanopayments — Zero-Gas Settlement
+
+agentpay-mcp supports [Circle Nanopayments](https://www.circle.com/nanopayments) as a settlement option for x402 v2 payments. Nanopayments enable gas-free sub-cent USDC transfers by batching small payments into single on-chain settlements.
+
+**How it works with agentpay-mcp:**
+- Agent makes an x402 payment via `x402_pay` as normal
+- If the x402 v2 server supports Circle Nanopayments, settlement happens gas-free
+- Sub-cent payments ($0.001, $0.0001) become economically viable for per-call API pricing
+- Cross-chain support via Circle's Gateway — works on any EVM chain
+
+This is especially useful for high-frequency agent workflows where gas costs would otherwise exceed the payment amount. See [Circle's announcement](https://www.mexc.com/news/971904) for protocol details.
 
 ---
 
