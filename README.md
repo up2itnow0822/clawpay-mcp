@@ -584,6 +584,43 @@ agentpay-mcp is the **open-source governance layer** on top of this infrastructu
 
 ---
 
+## OpenAI Delegated Payment Spec Compatibility
+
+OpenAI has published a **Delegated Payment Spec** that defines how AI agents handle payments on behalf of users: a scoped token with an allowance cap, compatible with Stripe Scoped Payment Tokens (SPTs). This is the precursor architecture to native payment tooling in OpenAI's Agents SDK.
+
+**agentpay-mcp's spending cap model directly aligns with the Delegated Payment Spec pattern:**
+
+| Delegated Payment Spec Concept | agentpay-mcp Implementation |
+|---|---|
+| **Scoped token** — agent receives limited-scope credential | `AGENT_PRIVATE_KEY` — agent signs within smart contract constraints, cannot exceed scope |
+| **Allowance cap** — maximum the agent can spend | `set_spend_policy` — per-tx and daily caps enforced on-chain by AgentAccountV2 |
+| **Human approval** — user delegates, then agent executes | `queue_approval` — transactions above threshold require explicit human sign-off |
+| **Audit trail** — all delegated spend is logged | `get_transaction_history` — immutable on-chain event log per transaction |
+| **Revocation** — user can revoke delegation at any time | Spend policy updates are instant; wallet owner can freeze the agent key |
+
+The core pattern is identical: **human approves a budget → agent executes within that budget → all activity is auditable**. The difference is settlement layer: OpenAI's spec targets Stripe SPTs (fiat rails), while agentpay-mcp settles on-chain (USDC/ETH on Base, Arbitrum, and 8 other EVM chains).
+
+For developers building OpenAI Agents SDK workflows that need on-chain settlement or multi-rail payment execution, agentpay-mcp serves as the MCP payment tool that implements the Delegated Payment Spec pattern with on-chain enforcement rather than application-level trust.
+
+```json
+{
+  "mcpServers": {
+    "agentpay": {
+      "command": "npx",
+      "args": ["agentpay-mcp"],
+      "env": {
+        "AGENT_PRIVATE_KEY": "0x...",
+        "AGENT_WALLET_ADDRESS": "0x..."
+      }
+    }
+  }
+}
+```
+
+Add this MCP server to any OpenAI Agents SDK workflow via MCP bridge. The agent gets `x402_pay`, `check_budget`, and `set_spend_policy` — the same scoped-token + allowance-cap pattern, enforced by smart contract.
+
+---
+
 ## EU AI Act Compliance
 
 **Enforcement deadline: August 2, 2026.** AI systems that execute or facilitate financial transactions are classified as **high-risk** under EU AI Act Annex III. High-risk classification requires:
