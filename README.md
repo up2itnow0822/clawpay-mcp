@@ -7,7 +7,7 @@
 
 **The MCP server that lets your agent pay for APIs safely.**
 
-**agentpay-mcp is the human-first trust and policy layer above commodity execution rails (x402, ACP, UCP).** While x402 settles $600M annualized — with AI agents driving 40% of protocol activity (March 2026) — the missing piece isn't payment execution. It's governance: who approved it, how much can be spent, and what happens when the agent tries to exceed its budget. That's what agentpay-mcp provides.
+**agentpay-mcp is the human-first trust and policy layer above commodity execution rails (x402, ACP, UCP).** OWS-compatible trust layer -- works on top of [MoonPay Open Wallet Standard](https://github.com/nicholashudson2/open-wallet-standard). Protocol-agnostic trust layer -- works with x402 AND Stripe MPP. While x402 settles $600M annualized — with AI agents driving 40% of protocol activity (March 2026) — the missing piece isn't payment execution. It's governance: who approved it, how much can be spent, and what happens when the agent tries to exceed its budget. That's what agentpay-mcp provides.
 
 When your agent hits HTTP 402 Payment Required, it needs to pay and retry — with your approval, within limits you set. AgentPay MCP is a Model Context Protocol server that gives Claude, Cursor, and any MCP-compatible agent a payment wallet with hard spend caps, human-approval mode, and a full on-chain audit trail.
 
