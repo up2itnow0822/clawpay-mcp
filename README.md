@@ -503,7 +503,11 @@ AgentPay MCP has **zero LiteLLM dependency**. The entire server runs on `viem` (
 
 ---
 
-## Stripe MCP vs agentpay-mcp
+## Competitive Positioning
+
+**The simplest way to think about it: ACP (Stripe) handles what agents SELL, agentpay-mcp handles what agents BUY.**
+
+### Stripe MCP vs agentpay-mcp
 
 Developers often ask: "Doesn't Stripe MCP already handle agent payments?" The answer is that **they solve different problems at different layers:**
 
