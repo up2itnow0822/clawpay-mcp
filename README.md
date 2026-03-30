@@ -5,9 +5,11 @@
 [![Tests](https://img.shields.io/badge/tests-149%20passing-brightgreen.svg)](tests/)
 [![Patent Pending](https://img.shields.io/badge/patent-pending-orange.svg)](https://uspto.gov)
 
-**The MCP server that lets your agent pay for APIs safely.**
+**Compatible with x402 V1/V2 + Stripe MPP — protocol-agnostic spend controls.**
 
 **agentpay-mcp is the human-first trust and policy layer above commodity execution rails (x402, ACP, UCP).** OWS-compatible trust layer -- works on top of [MoonPay Open Wallet Standard](https://github.com/nicholashudson2/open-wallet-standard). Protocol-agnostic trust layer -- works with x402 AND Stripe MPP. While x402 settles $600M annualized — with AI agents driving 40% of protocol activity (March 2026) — the missing piece isn't payment execution. It's governance: who approved it, how much can be spent, and what happens when the agent tries to exceed its budget. That's what agentpay-mcp provides.
+
+> **ACP handles what agents SELL. agentpay-mcp handles what agents BUY.** ACP (Agent Commerce Protocol) enables agents to list services, negotiate, and receive payments. agentpay-mcp is the complementary layer — controlling what agents *spend* when consuming paid APIs, tools, and services. Different problems, compatible solutions.
 
 When your agent hits HTTP 402 Payment Required, it needs to pay and retry — with your approval, within limits you set. AgentPay MCP is a Model Context Protocol server that gives Claude, Cursor, and any MCP-compatible agent a payment wallet with hard spend caps, human-approval mode, and a full on-chain audit trail.
 
@@ -673,6 +675,12 @@ For developers building OpenAI Agents SDK workflows that need on-chain settlemen
 ```
 
 Add this MCP server to any OpenAI Agents SDK workflow via MCP bridge. The agent gets `x402_pay`, `check_budget`, and `set_spend_policy` — the same scoped-token + allowance-cap pattern, enforced by smart contract.
+
+---
+
+## Google AP2 Compatibility
+
+agentpay-mcp complements Google's Agent2Agent Payment (AP2) protocol. AP2 — backed by 60+ organizations including Visa, Mastercard, and PayPal — handles agent payment *authorization*: verifying that a payment request is legitimate. agentpay-mcp operates at the governance layer above AP2, adding per-agent budget caps, daily spend limits, and human-approval thresholds that AP2 deliberately scopes as out-of-band. For enterprises deploying agents across multiple payment rails, agentpay-mcp provides the unified spend governance that no individual protocol covers.
 
 ---
 
