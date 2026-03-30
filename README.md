@@ -503,6 +503,26 @@ AgentPay MCP has **zero LiteLLM dependency**. The entire server runs on `viem` (
 
 ---
 
+## Stripe MCP vs agentpay-mcp
+
+Developers often ask: "Doesn't Stripe MCP already handle agent payments?" The answer is that **they solve different problems at different layers:**
+
+| | Stripe MCP | agentpay-mcp |
+|---|---|---|
+| **Direction of money** | User pays merchant (through agent) | Agent pays API provider |
+| **Use case** | Checkout, subscriptions, invoicing | API access, tool payments, agent-to-agent commerce |
+| **Settlement** | Traditional card rails | On-chain (Base, EVM) or Stripe MPP |
+| **Spend controls** | Customer-side (cart + checkout) | Agent-side (on-chain caps, human approval, session limits) |
+| **Protocol** | ACP (Agent Commerce Protocol) | x402 (HTTP 402 Payment Required) |
+
+**Stripe MCP** is a *merchant tool* — it helps businesses charge customers through agent interfaces. Think "buy this product" or "subscribe to that plan."
+
+**agentpay-mcp** is an *agent procurement tool* — it lets agents pay for the APIs and tools they need to do their work. Think "access this premium data endpoint" or "use this compute resource."
+
+Most production agents will need both layers: Stripe MCP for user-facing commerce, agentpay-mcp for the agent's own tool costs. They're complementary, not competing.
+
+---
+
 ## MCP 2026 Compliance
 
 AgentPay MCP aligns with the emerging MCP security standards for 2026, including CoSAI (Coalition for Secure AI) threat categories and OAuth 2.1 requirements.
