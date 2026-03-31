@@ -128,6 +128,34 @@ Agent gets the data. Full tx on basescan.org.
 
 ---
 
+## agentpay-mcp vs x402-mcp — What's the Difference?
+
+Both projects enable agent payments. They solve different problems at different layers.
+
+| Capability | **agentpay-mcp** | **x402-mcp** (Coinbase) |
+|---|---|---|
+| **Payment execution** | ✅ x402 + Stripe MPP | ✅ x402 only |
+| **On-chain spend caps** | ✅ Smart contract enforced | ❌ No caps |
+| **Per-session budget limits** | ✅ Hard session ceiling | ❌ Unlimited per session |
+| **Daily aggregate limits** | ✅ Configurable daily max | ❌ No daily limits |
+| **Human-in-the-loop approval** | ✅ Threshold-based queue | ❌ Fully autonomous only |
+| **Transaction simulation** | ✅ Dry-run before commit | ❌ Execute or nothing |
+| **Multi-protocol support** | ✅ x402 V1/V2 + Stripe MPP | ⚠️ x402 only |
+| **OWS wallet compatibility** | ✅ MoonPay Open Wallet Standard | ❌ Coinbase wallet only |
+| **Audit trail** | ✅ Full tx history with merchant, amount, status | ⚠️ Basic tx log |
+| **FinOps integration** | ✅ Cost attribution per session/agent | ❌ Not available |
+| **Fail-closed policy engine** | ✅ Errors → rejection, never approval | ❌ No policy engine |
+| **Non-custodial** | ✅ Keys never leave local machine | ✅ Keys never leave local machine |
+| **Enterprise trust signal** | ✅ [NVIDIA NeMo Toolkit PR #17](https://github.com/NVIDIA/NeMo-Agent-Toolkit-Examples/pull/17) merged | — |
+
+**When to use x402-mcp:** You want the simplest possible x402 payment integration with no governance requirements. Your agent operates with unlimited budget authority.
+
+**When to use agentpay-mcp:** You need spend controls, budget enforcement, human approval workflows, or multi-protocol support. Your agents operate against real enterprise budgets where runaway spending is a deployment blocker.
+
+> x402-mcp adds payments to your agent. agentpay-mcp adds *governed* payments — spend caps, session limits, human approval, and audit trails that enterprises require before deploying agents against production budgets.
+
+---
+
 ## Quick Start
 
 ### 1. Install
@@ -333,6 +361,65 @@ Agent: "Enrich this list of 50 leads and add to CRM"
 ```
 
 **Tools used:** `x402_pay`, `x402_session_start`, `set_spend_policy`, `get_transaction_history`
+
+---
+
+## Enterprise FinOps — Budget Cap Templates
+
+Production agent deployments need spending governance that satisfies enterprise FinOps requirements. These templates show common patterns for controlling agent spend at the infrastructure layer.
+
+### Per-Agent Department Budgets
+
+```json
+// Marketing agent — $50/day cap, restricted to approved data vendors
+{
+  "tool": "set_spend_policy",
+  "arguments": {
+    "perTxCapEth": "0.02",
+    "dailyLimitEth": "0.02",
+    "allowedRecipients": ["0xmarketingVendor1...", "0xmarketingVendor2..."]
+  }
+}
+
+// Engineering agent — $200/day cap, broader vendor access
+{
+  "tool": "set_spend_policy",
+  "arguments": {
+    "perTxCapEth": "0.04",
+    "dailyLimitEth": "0.08",
+    "allowedRecipients": ["0xcloudProvider...", "0xapiVendor...", "0xdataSource..."]
+  }
+}
+```
+
+### Tiered Approval Thresholds
+
+Map your org's approval matrix to agent spending tiers:
+
+```
+$0 - $1      -> auto-approved (routine API calls)
+$1 - $25     -> auto-approved with logging (standard tool usage)
+$25 - $100   -> queued for team lead approval via queue_approval
+$100+        -> queued for finance team approval
+```
+
+Set the auto-approve ceiling with `set_spend_policy`, and transactions above the per-tx cap automatically queue for human review. No code changes needed — the smart contract enforces it.
+
+### Budget Monitoring for FinOps Dashboards
+
+Pull real-time spend data for your FinOps tooling:
+
+```json
+// Check remaining budget before starting expensive workflows
+{ "tool": "check_budget", "arguments": {} }
+// Returns: { "remaining": "142.50 USDC", "spent": "57.50 USDC", "limit": "200.00 USDC" }
+
+// Pull transaction history for cost attribution
+{ "tool": "get_transaction_history", "arguments": { "limit": 100 } }
+// Each entry includes: merchant, amount, timestamp, tool context — ready for FinOps import
+```
+
+These patterns work with any FinOps platform (CloudHealth, Kubecost, Apptio) — export transaction history via the MCP tool and feed it into your existing cost attribution pipeline.
 
 ---
 
