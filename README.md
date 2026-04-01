@@ -17,6 +17,20 @@ The MCP ecosystem now has 97M+ monthly downloads and 10,000+ active servers — 
 
 ✅ Integrated into **[NVIDIA/NeMo-Agent-Toolkit-Examples](https://github.com/NVIDIA/NeMo-Agent-Toolkit-Examples/pull/17)** (PR #17 merged) — payment infrastructure for NVIDIA's official agent toolkit.
 
+## Who Uses agentpay-mcp?
+
+agentpay-mcp is built for three buyer personas who all share the same problem: autonomous agents spending money without controls.
+
+| Persona | Problem | What They Use agentpay-mcp For |
+|---------|---------|--------------------------------|
+| **FinOps Practitioners** (Fortune 500 AI spend owners) | 98% of FinOps teams now manage AI spend (FinOps Foundation 2026) — but no governance layer exists for autonomous agents | Cost center attribution, per-agent budget caps, CFO-ready spend dashboards, policy-as-code enforcement |
+| **Platform Engineers** (MCP / agent framework builders) | Agents call paid APIs at runtime with no native spend controls in x402, Stripe MPP, or MCP protocol | Drop-in spend governance middleware: daily caps, kill switches, per-task limits, audit trails |
+| **Enterprise Compliance Teams** (EU AI Act, SOC 2, internal audit) | EU AI Act Article 14 (enforced Aug 2, 2026) requires runtime human oversight and decision-time enforcement for autonomous agents | Human-approval queues, runtime kill switches, full on-chain audit trail for compliance evidence |
+
+> **FinOps teams:** agentpay-mcp is the first governance layer designed for your workflows — not just for developers. Budget caps, approval thresholds, and cost attribution that slot into your existing FinOps tooling.
+
+---
+
 ## Why Trust Matters
 
 McKinsey's 2026 AI Trust Maturity Survey quantifies what builders already feel: agent capability has outpaced agent governance.
