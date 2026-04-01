@@ -606,6 +606,62 @@ AgentPay MCP has **zero LiteLLM dependency**. The entire server runs on `viem` (
 
 ---
 
+## agentpay-mcp Already Supports Multiple Payment Rails
+
+The agent payment landscape just split: Coinbase's x402 (open, permissionless, on-chain) vs Stripe's MPP (permissioned, Tempo-based, USDC). Developers building production agents face a choice — or they use agentpay-mcp, which already sits above both.
+
+agentpay-mcp is **protocol-agnostic by design:**
+
+| Payment Rail | Status | How agentpay-mcp Works With It |
+|---|---|---|
+| **x402 (Coinbase)** | ✅ Supported | Native x402 V1/V2 payment execution with on-chain spend caps |
+| **Stripe MPP** | ✅ Compatible | MPP-compatible settlement layer separation — agentpay-mcp governs spend policy above MPP's settlement |
+| **Future rails** | ✅ Ready | Neutral governance architecture — new rails plug in without code changes |
+
+**Why this matters:** Neither x402 nor MPP ships spend governance. x402 wallets are unlimited by default. MPP offers human-set dashboard limits but no programmatic per-session or per-task enforcement. agentpay-mcp provides the budget circuit-breaker, approval workflows, and audit trail above both — regardless of which rail settles the transaction.
+
+This isn't a wrapper around one protocol. It's a governance layer with a deliberate separation between **policy** (who approved it, what's the budget, should a human review this) and **settlement** (which blockchain or payment network moves the money). That separation is what makes agentpay-mcp rail-neutral — and what positions it as the governance standard as the protocol war plays out.
+
+---
+
+## Works with AWS AgentCore
+
+AWS AgentCore provides enterprise-grade agent hosting with Cedar-based policy enforcement for access control. Cedar policies answer: "Is this agent allowed to call this API?" and "Can this agent access this resource?"
+
+What Cedar does NOT provide: **spend limits.** There is no Cedar primitive for "this agent can spend at most $50 per session" or "halt the agent if cumulative spend exceeds $200 today." Access control and budget governance are different problems.
+
+agentpay-mcp adds the budget circuit-breaker on top of AgentCore:
+
+| Layer | Who Handles It | What It Controls |
+|---|---|---|
+| **Access Control** | AWS AgentCore (Cedar) | Which APIs the agent can call, which resources it can access |
+| **Budget Governance** | agentpay-mcp | How much the agent can spend per transaction, per session, and per day |
+| **Human Oversight** | agentpay-mcp | When autonomous operation pauses for human approval |
+| **Audit Trail** | Both (complementary) | Cedar logs access decisions; agentpay-mcp logs spend decisions with on-chain receipts |
+
+**Deployment pattern:** AgentCore runs the agent with Cedar policies controlling tool access. agentpay-mcp runs as an MCP server within the agent's tool set, enforcing spend caps on every payment action. Cedar says "you may call this paid API." agentpay-mcp says "you may spend up to $5 on this call."
+
+```json
+{
+  "mcpServers": {
+    "agentpay": {
+      "command": "npx",
+      "args": ["agentpay-mcp"],
+      "env": {
+        "AGENT_PRIVATE_KEY": "0x...",
+        "AGENT_WALLET_ADDRESS": "0x...",
+        "MAX_TRANSACTION_USDC": "5.00",
+        "DAILY_LIMIT_USDC": "50.00"
+      }
+    }
+  }
+}
+```
+
+For enterprises running agents on AgentCore: Cedar handles the "can it?" question. agentpay-mcp handles the "should it spend this much?" question. Together, they provide the access + budget governance stack that production agent deployments require.
+
+---
+
 ## Competitive Positioning
 
 **The simplest way to think about it: ACP (Stripe) handles what agents SELL, agentpay-mcp handles what agents BUY.**
