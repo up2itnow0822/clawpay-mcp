@@ -88,6 +88,35 @@ If your security team is auditing MCP server dependencies after the LiteLLM inci
 
 ---
 
+## Trust & Governance — A2A Protocol Alignment
+
+Google's [Agent2Agent (A2A) protocol](https://github.com/a2aproject/A2A) (v1.0.0) establishes how agents discover, authenticate, and collaborate across organizational boundaries. The spec is built around Agent Cards, security schemes, and human-in-the-loop task management — but it deliberately does not define *spending governance* at the protocol level.
+
+agentpay-mcp fills that gap as a complementary governance layer. Here's how our controls map to A2A's architecture:
+
+| A2A Concept | What the Spec Defines | What agentpay-mcp Adds |
+|---|---|---|
+| **Agent Cards** (`capabilities`, `securitySchemes`) | Agents declare what they can do and how to authenticate | agentpay-mcp adds *spend policy* as a discoverable capability — daily caps, per-tx limits, approval thresholds |
+| **Human-in-the-loop** (`input-required` task state) | Tasks can pause for human input mid-execution | agentpay-mcp enforces this for payments: transactions above a configurable threshold queue for explicit human approval before executing |
+| **Security schemes** (OAuth, API keys, mTLS) | Authentication between agents | agentpay-mcp provides the *authorization* complement — not just "is this agent allowed to connect?" but "is this agent allowed to spend $X?" |
+| **Extensions** (spec §4.6) | Agents can expose additional structured data beyond core A2A | Spend caps, approval history, and transaction receipts can be surfaced as extension data in A2A task metadata |
+| **Opaque execution** (guiding principle) | Agents collaborate without exposing internals | agentpay-mcp preserves opacity — the paying agent's private key and internal budget logic never leave the local machine |
+
+### What This Means in Practice
+
+When two A2A-compliant agents collaborate on a task that involves paid API calls:
+
+1. **Discovery** — The calling agent reads the remote agent's Agent Card (A2A spec)
+2. **Authentication** — Mutual authentication via declared security schemes (A2A spec)
+3. **Spend governance** — agentpay-mcp enforces budget caps, logs transactions, and gates high-value payments on human approval (agentpay-mcp layer)
+4. **Audit** — Full on-chain transaction trail provides compliance evidence independent of either agent's internal state
+
+This positions agentpay-mcp as the **spend governance layer** for A2A-compliant agent ecosystems — complementing the protocol's identity and task management with the financial controls enterprises require before deploying autonomous agents.
+
+> **Note:** The A2A v1.0.0 spec does not define a trust scoring or trust signals mechanism at the protocol level. agentpay-mcp's governance controls (spend caps, human approval, on-chain audit trails) are designed to be compatible with future trust-related extensions as the A2A ecosystem evolves.
+
+---
+
 ## AI Agent Discovery
 
 AgentPay MCP is designed to be discovered and used by AI agents. Compatible with:
